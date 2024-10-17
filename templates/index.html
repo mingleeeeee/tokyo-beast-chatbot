@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot Interface</title>
+
+    <style>
+        /* Common Styles for Desktop and Mobile */
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+        }
+
+        #chatbot-container {
+            width: 100%;
+            max-width: 600px;
+            height: 80vh;
+            margin: 40px auto;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            background: #ffffff;
+        }
+
+        #chat-header {
+            background-color: #4CAF50;
+            padding: 10px;
+            color: white;
+            text-align: center;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+            font-size: 24px;
+        }
+
+        #chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .message {
+            max-width: 70%;
+            padding: 10px 15px;
+            margin: 5px 0;
+            border-radius: 12px;
+            line-height: 1.4;
+        }
+
+        .user {
+            align-self: flex-end;
+            background-color: #DCF8C6;
+            color: #333;
+        }
+
+        .bot {
+            align-self: flex-start;
+            background-color: #F1F0F0;
+            color: #333;
+        }
+
+        /* Chat input container */
+        #chat-input-container {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 10px;
+            border-top: 1px solid #ddd;
+        }
+
+        /* Microphone Button Styling */
+        #start-talking-button {
+            width: 60px;
+            height: 60px;
+            border: none;
+            border-radius: 50%;
+            background-color: #e0e0e0;
+            font-size: 30px;
+            color: #333;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        #start-talking-button:hover {
+            background-color: #cccccc;
+        }
+
+        #start-talking-button.recording {
+            background-color: #ff4d4d;
+            color: #fff;
+        }
+
+        /* Keyboard Icon Button Styling */
+        .icon-button {
+            background-color: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 24px;
+            margin-left: 10px;
+        }
+
+        .icon-button:hover {
+            background-color: #e0e0e0;
+            border-radius: 50%;
+            padding: 10px;
+        }
+
+        /* Stop Audio Button Styling */
+        #stop-audio-button {
+            background-color: #ff4d4d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        #stop-audio-button:hover {
+            background-color: #ff0000;
+        }
+
+        #stop-audio-button:active {
+            background-color: #cc0000;
+        }
+
+        /* Hidden Input and Send Button Container */
+        #hidden-input-container {
+            display: flex;
+            margin-top: 10px;
+        }
+
+        #chat-input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-right: 10px;
+            font-size: 16px;
+        }
+
+        #send-button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        #send-button:hover {
+            background-color: #45a049;
+        }
+
+        .message.loading {
+            font-style: italic;
+            color: #999;
+            background-color: transparent;
+            font-weight: bold;
+            font-size: 16px;
+            align-self: center;
+            text-align: center;
+            width: 100%;
+        }
+
+        /* Mobile-Specific Styles */
+        @media only screen and (max-width: 600px) {
+            #chatbot-container {
+                width: 100%;
+                height: 70vh;
+                margin: 0;
+                border-radius: 0;
+                box-shadow: none;
+            }
+
+            #chat-header {
+                font-size: 18px;
+                padding: 10px;
+            }
+
+            #chat-messages {
+                padding: 10px;
+            }
+
+            .message {
+                max-width: 100%;
+                font-size: 14px;
+            }
+
+            #chat-input-container {
+                padding: 5px;
+                justify-content: space-between;
+                margin-bottom: 20px;
+            }
+
+            #start-talking-button, #stop-audio-button {
+                width: 50px;
+                height: 50px;
+                font-size: 24px;
+            }
+
+            #chat-input {
+                padding: 8px;
+                font-size: 16px;
+            }
+
+            #send-button {
+                padding: 8px 12px;
+            }
+        }
+    </style>
+
+</head>
+<body>
+    <div id="chatbot-container">
+        <!-- Chat header -->
+        <div id="chat-header">
+            <h2>Tokyobeast (OpenAI TTS)</h2>
+<!--
+            <button onclick="window.location.href='/polly'" class="navigation-button">
+                Switch to Amazon Polly TTS
+            </button> -->
+        </div>
+
+        <!-- Chat messages container -->
+        <div id="chat-messages" class="chat-box">
+            <!-- Chat bubbles will be dynamically added here -->
+        </div>
+
+        <!-- Chat input container -->
+        <div id="chat-input-container">
+            <!-- Microphone Button -->
+            <button id="start-talking-button" class="mic-button">🎤</button>
+
+            <!-- Stop Audio Button -->
+            <button id="stop-audio-button" class="icon-button" title="Stop playing audio">Pause</button>
+
+            <!-- Keyboard Icon Button (to show input field) -->
+            <button id="keyboard-button" class="icon-button" title="Show input box">⌨️</button>
+        </div>
+
+        <!-- Hidden Text Input and Send Button Container -->
+        <div id="hidden-input-container">
+            <input type="text" id="chat-input" placeholder="Type your message here...">
+            <button id="send-button">Send</button>
+        </div>
+    </div>
+
+    <!-- Include Socket.IO and Client-Side JavaScript -->
+    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const socket = io.connect();
+            const startTalkingButton = document.getElementById("start-talking-button");
+            const keyboardButton = document.getElementById("keyboard-button");
+            const sendButton = document.getElementById("send-button");
+            const stopAudioButton = document.getElementById("stop-audio-button");
+            const userInput = document.getElementById("chat-input");
+            const messagesDiv = document.getElementById("chat-messages");
+            const hiddenInputContainer = document.getElementById("hidden-input-container");
+            let audioPlayer = null;
+            let loadingMessageElement = null;
+            let loadingInterval = null;
+
+            let mediaRecorder;
+            let audioChunks = [];
+
+            hiddenInputContainer.style.display = 'none';
+
+            // Function to create an audio player when needed
+            function initializeAudioPlayer() {
+                if (!audioPlayer) {
+                    audioPlayer = new Audio();
+                }
+            }
+
+            // Handle incoming message and audio data from the server
+            socket.on("response_with_audio", data => {
+                removeLoadingIndicator();
+                appendMessage("bot", data.message);
+
+                if (data.audio) {
+                    const audioBlob = new Blob([data.audio], { type: 'audio/mp3' });
+                    const audioUrl = URL.createObjectURL(audioBlob);
+
+                    // Initialize and stop the current audio before playing the new one
+                    initializeAudioPlayer();
+                    if (!audioPlayer.paused) {
+                        audioPlayer.pause();
+                        audioPlayer.currentTime = 0;
+                    }
+
+                    audioPlayer.src = audioUrl;
+                    audioPlayer.onloadedmetadata = () => {
+                        audioPlayer.play().catch(error => {
+                            console.error("Playback error on mobile:", error);
+                        });
+                    };
+                } else {
+                    console.error('Failed to generate audio:', data.error);
+                }
+            });
+
+            socket.on("stt_response", data => {
+                removeLoadingIndicator();
+
+                if (data.text) {
+                    appendMessage("user", data.text);
+                    showLoadingIndicator();
+                    socket.emit("message", data.text);
+                } else {
+                    appendMessage("user", "Unable to detect human voice.");
+                    console.error('Failed to convert speech to text:', data.error);
+                }
+            });
+
+            stopAudioButton.addEventListener("click", () => {
+                if (audioPlayer) {
+                    audioPlayer.pause();
+                    audioPlayer.currentTime = 0;
+                    console.log("Audio playback stopped.");
+                }
+            });
+
+            keyboardButton.addEventListener("click", () => {
+                const isVisible = hiddenInputContainer.style.display === 'flex';
+                hiddenInputContainer.style.display = isVisible ? 'none' : 'flex';
+                hiddenInputContainer.style.flexDirection = 'row';
+                if (!isVisible) {
+                    userInput.focus();
+                }
+            });
+
+            sendButton.addEventListener("click", () => {
+                const message = userInput.value.trim();
+                if (message) {
+                    appendMessage("user", message);
+                    socket.emit("message", message);
+                    userInput.value = "";  // Clear the input field after sending
+                    showLoadingIndicator();
+
+                    initializeAudioPlayer();
+                    if (!audioPlayer.paused) {
+                        audioPlayer.pause();
+                        audioPlayer.currentTime = 0;
+                    }
+                }
+            });
+
+            userInput.addEventListener("keyup", (event) => {
+                if (event.key === "Enter" || event.keyCode === 13) {
+                    sendButton.click();  // Trigger send button click on 'Enter' press
+                }
+            });
+
+            // Recording functionality
+            startTalkingButton.addEventListener("click", () => {
+                if (mediaRecorder && mediaRecorder.state === "recording") {
+                    mediaRecorder.stop();
+                    startTalkingButton.classList.remove("recording");
+                    startTalkingButton.textContent = "🎤";
+                } else {
+                    startRecording();
+                    startTalkingButton.classList.add("recording");
+                    startTalkingButton.textContent = "🎤";
+                }
+            });
+
+            function startRecording() {
+                navigator.mediaDevices.getUserMedia({ audio: true })
+                    .then(stream => {
+                        mediaRecorder = new MediaRecorder(stream);
+                        mediaRecorder.start();
+
+                        audioChunks = [];
+
+                        mediaRecorder.ondataavailable = (event) => {
+                            audioChunks.push(event.data);
+                        };
+
+                        mediaRecorder.onstop = () => {
+                            const audioBlob = new Blob(audioChunks, { type: 'audio/mp3' });
+                            const reader = new FileReader();
+
+                            reader.onload = () => {
+                                const arrayBuffer = reader.result;
+                                const audioData = new Uint8Array(arrayBuffer);
+                                socket.emit("speech_to_text", { audio: audioData });
+                            };
+
+                            reader.readAsArrayBuffer(audioBlob);
+                            showLoadingIndicator(true);
+                        };
+                    })
+                    .catch(error => {
+                        console.error("Error accessing microphone:", error);
+                    });
+            }
+
+            function appendMessage(sender, message) {
+                const messageElement = document.createElement("div");
+                messageElement.classList.add("message", sender.toLowerCase());
+                messageElement.innerHTML = message;
+                messagesDiv.appendChild(messageElement);
+                messagesDiv.scrollTop = messagesDiv.scrollHeight;  // Scroll to bottom
+            }
+
+            function showLoadingIndicator() {
+                if (!loadingMessageElement) {
+                    loadingMessageElement = document.createElement("div");
+                    loadingMessageElement.classList.add("message", "loading");
+                    loadingMessageElement.textContent = ".";
+
+                    loadingMessageElement.style.textAlign = 'center';
+                    loadingMessageElement.style.alignSelf = 'center';
+
+                    messagesDiv.appendChild(loadingMessageElement);
+                    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+                    let dots = 1;
+                    loadingInterval = setInterval(() => {
+                        dots = (dots % 3) + 1;
+                        loadingMessageElement.textContent = ".".repeat(dots);
+                    }, 500);
+                }
+            }
+
+            function removeLoadingIndicator() {
+                if (loadingMessageElement) {
+                    messagesDiv.removeChild(loadingMessageElement);
+                    loadingMessageElement = null;
+                }
+                if (loadingInterval) {
+                    clearInterval(loadingInterval);
+                    loadingInterval = null;
+                }
+            }
+        });
+    </script>
+</body>
+</html>

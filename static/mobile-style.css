@@ -1,0 +1,116 @@
+/* General Styles */
+body, html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    font-family: Arial, sans-serif;
+    background-color: #f8f9fa;
+}
+
+#mobile-chatbot-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    width: 100%;
+    max-width: 100%;
+    margin: 0 auto;
+    background-color: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Chat Header */
+#mobile-chat-header {
+    background-color: #4CAF50;
+    color: white;
+    text-align: center;
+    padding: 10px;
+}
+
+/* Chat Messages */
+#mobile-chat-messages {
+    flex: 1;
+    padding: 15px;
+    overflow-y: scroll;
+    background-color: #f0f0f0;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Chat Messages Style */
+.message {
+    padding: 10px 15px;
+    margin: 10px 0;
+    border-radius: 12px;
+    max-width: 70%;
+    word-wrap: break-word;
+    font-size: 16px;
+}
+
+.user {
+    background-color: #dcf8c6;
+    align-self: flex-end;
+}
+
+.bot {
+    background-color: #e0e0e0;
+    align-self: flex-start;
+}
+
+/* Chat Controls */
+#mobile-chat-controls {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    background-color: #fff;
+    box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Microphone and Stop Audio Button */
+.mobile-control-button {
+    width: 50px;
+    height: 50px;
+    background-color: #e0e0e0;
+    border-radius: 50%;
+    font-size: 24px;
+    border: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+.mobile-control-button:active {
+    background-color: #d0d0d0;
+}
+
+/* Text Input and Send Button */
+#mobile-text-input-container {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    margin: 0 10px;
+}
+
+#mobile-chat-input {
+    flex: 1;
+    padding: 10px;
+    border-radius: 25px;
+    border: 1px solid #ddd;
+    font-size: 16px;
+}
+
+#mobile-send-button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 25px;
+    margin-left: 10px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+#mobile-send-button:active {
+    background-color: #45a049;
+}
